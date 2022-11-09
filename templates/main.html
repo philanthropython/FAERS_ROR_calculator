@@ -1,0 +1,137 @@
+{% extends 'layout.html' %}
+{% block content %}
+<p>
+<!-- {{ message }} -->
+Preset data: FAERS {{ sammary['year'] }}, {{ sammary['n_cases'] }} cases
+<!--     , {{ sammary['n_drugs'] }} drugs, {{ sammary['n_reacs'] }} reactions -->
+</p>
+<hr>
+<form>
+	<p>
+        <table>
+            <caption style="text-align:left;"><strong>Drug:</strong></caption>
+            <tr>
+                <td>Level</td>
+                <td>
+                    <select name="drug_level" style="padding:3px; font-size:14px; width:6.5em;" onchange="changeDrugLevel()">
+                        <option value='prod_ai'{% if params['drug_level'] == 'prod_ai' %} selected{% endif %}>prod_ai</option>
+                        <option value='lvl5'{% if params['drug_level'] == 'lvl5' %} selected{% endif %}>lvl5</option>
+                        <option value='lvl4'{% if params['drug_level'] == 'lvl4' %} selected{% endif %}>lvl4</option>
+                        <option value='lvl3'{% if params['drug_level'] == 'lvl3' %} selected{% endif %}>lvl3</option>
+                        <option value='lvl2'{% if params['drug_level'] == 'lvl2' %} selected{% endif %}>lvl2</option>
+                        <option value='lvl1'{% if params['drug_level'] == 'lvl1' %} selected{% endif %}>lvl1</option>
+                    </select>
+                    <span style="font-size:14px;">({{ sammary['n_drugs'] }} drugs)</span>
+                </td>
+                <td style="text-align:right;"><a href='https://www.kegg.jp/kegg-bin/get_htext?br08303.keg' target="_blank" rel="noopener noreferrer" style="text-align:right;">ATC Classification</a></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td colspan="2" width="95%">
+                    <input type="text" name="drug_name" id="drug_name" autocomplete="on" list="drug_list" value="{{params['drug_name']}}" onChange="submitVals()" style="width:100%; font-size:16px; padding:5px;">
+                </td>
+            </tr>
+        </table>
+    </p>
+    <p>
+        <table>
+            <caption style="text-align:left;"><strong>Adverse Reaction:</strong></caption>
+            <tr>
+                <td>Level</td>
+                <td>
+                    <select name="reac_level" style="padding:3px; font-size:14px; width:6.5em;" onchange="changeReacLevel()">
+                        <option value='pt'{% if params['reac_level'] == 'pt' %} selected{% endif %}>pt</option>
+                        <option value='PT_jp'{% if params['reac_level'] == 'PT_jp' %} selected{% endif %}>PT_jp</option>
+                        <option value='HLT_en'{% if params['reac_level'] == 'HLT_en' %} selected{% endif %}>HLT_en</option>
+                        <option value='HLT_jp'{% if params['reac_level'] == 'HLT_jp' %} selected{% endif %}>HLT_jp</option>
+                        <option value='HLGT_en'{% if params['reac_level'] == 'HLGT_en' %} selected{% endif %}>HLGT_en</option>
+                        <option value='HLGT_jp'{% if params['reac_level'] == 'HLGT_jp' %} selected{% endif %}>HLGT_jp</option>
+                        <option value='SOC_en'{% if params['reac_level'] == 'SOC_en' %} selected{% endif %}>SOC_en</option>
+                        <option value='SOC_jp'{% if params['reac_level'] == 'SOC_jp' %} selected{% endif %}>SOC_jp</option>
+                    </select>
+                    <span style="font-size:14px;">({{ sammary['n_reacs'] }} reactions)</span>
+                </td>
+                <td style="text-align:right;"><a href='https://www.jmo.gr.jp/jmo/servlet/mdrLoginTop' target="_blank" rel="noopener noreferrer">MedDRA</a></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td colspan="2" width="95%">
+                    <input type="text" name="reac_name" id="reac_name" autocomplete="on" list="reac_list" value="{{params['reac_name']}}" onChange="submitVals()" style="width:100%; font-size:16px; padding:5px;">
+                </td>
+            </tr>
+        </table>
+	</p>
+    <p>
+        <label for="ftype"><strong>File format:</strong></label>
+        <input type="radio" name="ftype" value="xlsx"{% if params['ftype'] != 'csv' %} checked="checked"{% endif %}>Excel
+        <input type="radio" name="ftype" value="csv"{% if params['ftype'] == 'csv' %} checked="checked"{% endif %}>CSV 
+	</p>
+	<button type="submit" formaction='/result' formmethod='post' style="padding:10px; font-size:16px;">Download</button>
+</form>
+<script type="text/javascript">
+    function changeDrugLevel() {
+        with(document.forms[0]){
+            action="/d";
+            method="post";
+            submit()
+        }
+    }
+
+    function changeReacLevel() {
+        with(document.forms[0]){
+            action="/r";
+            method="post";
+            submit()
+        }
+    }
+        
+    function submitVals() {
+        with(document.forms[0]){
+            action="/t";
+            method="post";
+            submit()
+        }
+    }
+//     function keepVals() {
+//         with(document.forms[0]){
+//             action="/test";
+//             method="post";
+//             submit()
+//         }
+//     }
+//     function send() {
+//         with(document.forms[0]){
+//             action="/result";
+// //             method="post";
+//             submit()
+//         }
+//     }
+</script>
+
+<hr>
+<p>
+<h2>Instructions</h2>
+<li>薬剤および副作用のカテゴリーレベルを変更すると、ドロップダウンリストが更新されます。</li>
+<li>Drugのみ入力：指定した薬剤と関連する副作用のオッズ比を算出します。</li>
+<li>Adverse Reactionのみ入力：指定した副作用と関連する薬剤のオッズ比を算出します。</li>
+<li>DrugとAdverse Reaction両方を入力：指定した薬剤と副作用の組み合わせに関連する<u>併用薬</u>のオッズ比を算出します。</li>
+<!-- <li>薬剤および副作用のカテゴリーレベルを変更する場合は、drug levelおよびreac levelを変更して「reload」をクリックしてください。</li> -->
+</p>
+
+
+<datalist id="drug_list">
+	{% for drug in drug_list: %}
+		<option>{{ drug }}</option>
+	{% endfor %}
+</datalist>
+
+<datalist id="reac_list">
+	{% for reac in reac_list: %}
+		<option>{{ reac }}</option>
+	{% endfor %}
+</datalist>
+
+<script src="../static/js/ajax.js"></script>
+
+
+{% endblock %}

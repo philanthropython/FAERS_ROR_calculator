@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+{% block content %}
+<p>
+<!-- {{ message }} -->
+Preset data: FAERS {{ sammary['year'] }}, {{ sammary['n_cases'] }} cases, {{ sammary['n_drugs'] }} drugs, {{ sammary['n_reacs'] }} reactions
+</p>
+
+<form action='/level' method='get'>
+    <label for='drug'>Drug level:</label>
+    <select name="drug" style="padding:3px; font-size:14px; width:6.5em;">
+        <option value='prod_ai'>prod_ai</option>
+        <option value='lvl5'>lvl5</option>
+        <option value='lvl4'>lvl4</option>
+        <option value='lvl3'>lvl3</option>
+        <option value='lvl2'>lvl2</option>
+        <option value='lvl1'>lvl1</option>
+    </select>
+    (<a href='https://www.kegg.jp/kegg-bin/get_htext?br08303.keg' target="_blank" rel="noopener noreferrer">ATC Classification</a>)
+    <br>
+    <label for='reac'>Reac level:</label>
+    <select name="reac" style="padding:3px; font-size:14px; width:6.5em;">
+        <option value='pt'>pt</option>
+        <option value='PT_jp'>PT_jp</option>
+        <option value='HLT_en'>HLT_en</option>
+        <option value='HLT_jp'>HLT_jp</option>
+        <option value='HLGT_en'>HLGT_en</option>
+        <option value='HLGT_jp'>HLGT_jp</option>
+        <option value='SOC_en'>SOC_en</option>
+        <option value='SOC_jp'>SOC_jp</option>
+    </select>
+    (<a href='https://www.jmo.gr.jp/jmo/servlet/mdrLoginTop' target="_blank" rel="noopener noreferrer">MedDRA</a>)
+    <br>
+    <button type="submit" style="padding:3px; font-size:14px;">Reload</button>
+</form>
+<hr>
+<form action="/result" method="get">
+	<p>
+	<label for="drug">Drug ({{ levels['DRUG'] }}):</label>
+	<input type="text" name="drug" id="drug" autocomplete="on" list="drug_list" style="width:100%; font-size:16px; padding:5px;">
+	</p>
+	<p>
+	<label for="reac">Adverse Reaction ({{ levels['REAC'] }}):</label>
+	<input type="text" name="reac" id="reac" autocomplete="on" list="reac_list" style="width:100%; font-size:16px; padding:5px;">
+	</p>
+	<p>
+	<label for="ftype">File format:</label>
+	<input type="radio" name="ftype" value="xlsx" checked="checked">Excel
+	<input type="radio" name="ftype" value="csv">CSV 
+	</p>
+	<button type="submit" style="padding:10px; font-size:16px;">Download</button>
+</form>
+<script type="text/javascript">
+
+</script>
+
+<p>
+<h2>Instructions</h2>
+<li>Drugのみ入力：指定した薬剤と関連する副作用のオッズ比を算出します。</li>
+<li>Adverse Reactionのみ入力：指定した副作用と関連する薬剤のオッズ比を算出します。</li>
+<li>DrugとAdverse Reaction両方を入力：指定した薬剤と副作用の組み合わせに関連する<u>併用薬</u>のオッズ比を算出します。</li>
+<li>薬剤および副作用のカテゴリーレベルを変更する場合は、drug levelおよびreac levelを変更して「reload」をクリックしてください。</li>
+</p>
+
+
+<datalist id="drug_list">
+	{% for drug in drug_list: %}
+		<option>{{ drug }}</option>
+	{% endfor %}
+</datalist>
+
+<datalist id="reac_list">
+	{% for reac in reac_list: %}
+		<option>{{ reac }}</option>
+	{% endfor %}
+</datalist>
+
+<script src="../static/js/ajax.js"></script>
+
+
+{% endblock %}
