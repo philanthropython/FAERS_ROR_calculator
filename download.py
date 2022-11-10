@@ -1,82 +1,80 @@
 import os
-import urllib.request
-import requests
-import shutil
-import sys
-import settings
-from tqdm import tqdm
-from requests.exceptions import RequestException
 import logging
+import requests
+from requests.exceptions import RequestException
 import zipfile
-
-faers_url = settings.FAERS_URL
-years = settings.YEARS
-quarters = settings.quarters
-download_dir = settings.DOWNLOAD_DIR
-unpack_dir = settings.UNPACK_DIR
+from tqdm import tqdm
+import settings
 
 logger = logging.getLogger(__name__)
 
-def progress( block_count, block_size, total_size ):
-    ''' コールバック関数 '''
-    percentage = 100.0 * block_count * block_size / total_size
-    # 改行したくないので print 文は使わない
-    sys.stdout.write( "%.2f %% ( %d KB )\r"
-            % ( percentage, total_size / 1024 ) )
+def check_dir(dir:str):
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
+        
+def check_request(url):
+    r = requests.get(url, stream=True)
+    try:
+        r.raise_for_status()
+        return True
+    except RequestException as e:
+        logger.exception("request failed. error=(%s)", e.response.text)
+        return False
 
-def _progress(cnt, chunk, total):
-  now = cnt * chunk
-  if(now > total): now = total
-  sys.stdout.write('\rdownloading {} {} / {} ({:.1%})'.format(filename, now, total, now/total))
-  sys.stdout.flush()
+def download(url:str, filepath:str):
+    r = requests.get(url, stream=True)
+    
+    total_size = int(r.headers.get('content-length', 0));
+    chunk_size = 32 * 1024
+    downloaded = 0
 
-if not os.path.exists(download_dir):
-    os.mkdir(download_dir)
+    print('Download: ' + url)
+    pbar = tqdm(total=total_size, unit='B', unit_scale=True)
+    with open(filepath, 'wb') as f:
+            for data in r.iter_content(chunk_size):
+                f.write(data)
+                downloaded+=len(data)
+                pbar.update(chunk_size)
 
-for y in years:
-    for q in quarters:
-        filename = 'faers_ascii_' + y + q + '.zip'
-        url = os.path.join(faers_url, filename)
-        filepath = os.path.join(download_dir, filename)
-        if not os.path.exists(filepath):
-            #print(url)
-            #urllib.request.urlretrieve(url, filepath, _progress)
-            r = requests.get(url, stream=True)
-            try:
-                r.raise_for_status()
-            except RequestException as e:
-                logger.exception("request failed. error=(%s)", e.response.text)
-                continue
-            #print(r.status_code())
-            total_size = int(r.headers.get('content-length', 0));
-            chunk_size = 32 * 1024
-            downloaded = 0
+    if total_size != 0 and downloaded != total_size:
+        print("ERROR, download failed")
+        
+def unzip(filepath:str, out_dir:str):
+    print('extracting files from {}'.format(filepath))
+    with zipfile.ZipFile(filepath) as zf:
+        files = zf.namelist()
+        DEMO = [file for file in files if 'DEMO' in file and file.endswith('.txt')]
+        DRUG = [file for file in files if 'DRUG' in file and file.endswith('.txt')] 
+        REAC = [file for file in files if 'REAC' in file and file.endswith('.txt')]
+        zf.extractall(path=out_dir ,members=DEMO+DRUG+REAC)
 
-            pbar = tqdm(total=total_size, unit='B', unit_scale=True)
-            with open(filepath, 'wb') as f:
-                    for data in r.iter_content(chunk_size):
-                        f.write(data)
-                        downloaded+=len(data)
-                        pbar.update(chunk_size)
+def rename_dir(dir:str, newname:str):
+    dirname_upper = os.path.join(dir, 'ASCII')
+    dirname_lower = os.path.join(dir, 'ascii')
+    new_dirname = os.path.join(dir, newname)
+    if os.path.isdir(dirname_upper):
+        os.rename(dirname_upper, new_dirname)
+    else:
+        os.rename(dirname_lower, new_dirname)
 
-            if total_size != 0 and downloaded != total_size:
-                print("ERROR, download failed")
+if __name__ == '__main__':
+    
+    faers_url = settings.FAERS_URL
+    years = settings.YEARS
+    quarters = settings.quarters
+    download_dir = settings.DOWNLOAD_DIR
+    unpack_dir = settings.UNPACK_DIR
 
-        out_dir = os.path.join(unpack_dir, y+q)
-        if not os.path.exists(out_dir):
-            #shutil.unpack_archive(filepath, os.path.join(unpack_dir, y+qy))
-            print('extracting files from {}'.format(filepath))
-            with zipfile.ZipFile(filepath) as zf:
-                files = zf.namelist()
-                DEMO = [file for file in files if 'DEMO' in file and file.endswith('.txt')]
-                DRUG = [file for file in files if 'DRUG' in file and file.endswith('.txt')] 
-                REAC = [file for file in files if 'REAC' in file and file.endswith('.txt')]
-                zf.extractall(path=unpack_dir ,members=DEMO+DRUG+REAC)
-                txt_dir_upper = os.path.join(unpack_dir, 'ASCII')
-                txt_dir_lower = os.path.join(unpack_dir, 'ascii')
-                if os.path.exists(txt_dir_upper):
-                    os.rename(txt_dir_upper, out_dir)
-                else:
-                    os.rename(txt_dir_lower, out_dir)
-
-
+    check_dir(download_dir)
+    check_dir(unpack_dir)
+    
+    for y in years:
+        for q in quarters:
+            filename = 'faers_ascii_' + y + q + '.zip'
+            url = os.path.join(faers_url, filename)
+            filepath = os.path.join(download_dir, filename)
+            if not os.path.exists(filepath) and check_request(url):
+                # if check_request(url):
+                download(url, filepath)
+                unzip(filepath, unpack_dir)
+                rename_dir(unpack_dir, newname=y+q)
