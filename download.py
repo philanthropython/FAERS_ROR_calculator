@@ -39,7 +39,7 @@ for y in years:
         url = os.path.join(faers_url, filename)
         filepath = os.path.join(download_dir, filename)
         if not os.path.exists(filepath):
-            print(url)
+            #print(url)
             #urllib.request.urlretrieve(url, filepath, _progress)
             r = requests.get(url, stream=True)
             try:
@@ -62,12 +62,21 @@ for y in years:
             if total_size != 0 and downloaded != total_size:
                 print("ERROR, download failed")
 
+        out_dir = os.path.join(unpack_dir, y+q)
+        if not os.path.exists(out_dir):
             #shutil.unpack_archive(filepath, os.path.join(unpack_dir, y+qy))
-            out_dir = os.path.join(unpack_dir)
+            print('extracting files from {}'.format(filepath))
             with zipfile.ZipFile(filepath) as zf:
                 files = zf.namelist()
                 DEMO = [file for file in files if 'DEMO' in file and file.endswith('.txt')]
                 DRUG = [file for file in files if 'DRUG' in file and file.endswith('.txt')] 
                 REAC = [file for file in files if 'REAC' in file and file.endswith('.txt')]
-                zf.extractall(path=out_dir ,members=DEMO+DRUG+REAC)
+                zf.extractall(path=unpack_dir ,members=DEMO+DRUG+REAC)
+                txt_dir_upper = os.path.join(unpack_dir, 'ASCII')
+                txt_dir_lower = os.path.join(unpack_dir, 'ascii')
+                if os.path.exists(txt_dir_upper):
+                    os.rename(txt_dir_upper, out_dir)
+                else:
+                    os.rename(txt_dir_lower, out_dir)
+
 
