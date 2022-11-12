@@ -1,3 +1,4 @@
+import glob
 import os
 import logging
 import requests
@@ -59,6 +60,14 @@ def rename_dir(dir:str, newname:str):
     if os.path.exists(os.path.join(new_dirname, 'DEMO18Q1_new.txt')):
         os.rename(os.path.join(new_dirname, 'DEMO18Q1_new.txt'), os.path.join(new_dirname, 'DEMO18Q1.txt'))
 
+def rename_files(dir:str):
+    '''
+    DEMO18Q1_new.txtのように"_new"が付いたファイルがあるので、"_new"を削除する
+    '''
+    files = glob.glob(os.path.join(dir, '**/*_new.txt'), recursive=True)
+    for file in files:
+        os.rename(file, file.replace('_new', ''))
+
 if __name__ == '__main__':
     
     faers_url = settings.FAERS_URL
@@ -80,3 +89,5 @@ if __name__ == '__main__':
                 download(url, filepath)
                 unzip(filepath, unpack_dir)
             rename_dir(unpack_dir, newname=y+q)
+    
+    rename_files(unpack_dir)
