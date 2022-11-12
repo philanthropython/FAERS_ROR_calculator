@@ -137,7 +137,8 @@ class FAERS():
                                  .drop_duplicates() \
                                  .reset_index(drop=True)
             tmp = self.to_sparseMatrix(df, 'primaryid', col)[:2]
-            self._pickle_dump(tmp, out_dir + col + '.pkl')
+            self._pickle_dump(tmp, os.path.join(out_dir, col+'.pkl'))
+            self._pickle_dump(tmp[1], os.path.join(out_dir, col+'_labels.pkl'))
             
     
     def _pickle_dump(self, obj, fname):
@@ -249,8 +250,8 @@ class FAERS():
 #         REAC = self.data[levels['REAC']]
 #         drug_labels = self.labels[levels['DRUG']]
 #         reac_labels = self.labels[levels['REAC']]
-        self.DRUG, self.drug_labels = self._pickle_load(pkl_dir + levels['DRUG'] + '.pkl')
-        self.REAC, self.reac_labels = self._pickle_load(pkl_dir + levels['REAC'] + '.pkl')
+        self.DRUG, self.drug_labels = self._pickle_load(os.path.join(pkl_dir, levels['DRUG'] + '.pkl'))
+        self.REAC, self.reac_labels = self._pickle_load(os.path.join(pkl_dir, levels['REAC'] + '.pkl'))
         
 #         return DRUG, REAC, drug_labels, reac_labels
 

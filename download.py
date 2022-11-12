@@ -56,6 +56,8 @@ def rename_dir(dir:str, newname:str):
         os.rename(dirname_upper, new_dirname)
     else:
         os.rename(dirname_lower, new_dirname)
+    if os.path.exists(os.path.join(new_dirname, 'DEMO18Q1_new.txt')):
+        os.rename(os.path.join(new_dirname, 'DEMO18Q1_new.txt'), os.path.join(new_dirname, 'DEMO18Q1.txt'))
 
 if __name__ == '__main__':
     
@@ -73,8 +75,8 @@ if __name__ == '__main__':
             filename = 'faers_ascii_' + y + q + '.zip'
             url = os.path.join(faers_url, filename)
             filepath = os.path.join(download_dir, filename)
-            if not os.path.exists(filepath) and check_request(url):
-                # if check_request(url):
+            out_path = os.path.join(unpack_dir, y+q)
+            if not os.path.exists(out_path) and check_request(url):
                 download(url, filepath)
                 unzip(filepath, unpack_dir)
-                rename_dir(unpack_dir, newname=y+q)
+            rename_dir(unpack_dir, newname=y+q)
