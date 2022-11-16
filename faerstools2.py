@@ -7,7 +7,7 @@ from scipy.sparse import csr_matrix, csc_matrix
 class FAERS():
     def __init__(self, pkl_dir):
         self.pkl_dir = pkl_dir
-    
+        
     
     def load_cache(self, path):
         with open(path, 'rb') as f:
@@ -25,7 +25,7 @@ class FAERS():
         """
         print('1: loading files...')
         
-        self.FAERS_path = params['FAERS_path']
+        self.data_dir = params['data_dir']
         self.quarters = params['quarters']
         self.keep = params['keep']
         ATC_path = params['ATC_path']
@@ -53,9 +53,11 @@ class FAERS():
         df = pd.DataFrame()
         usecols = cols.keys()
         for q in self.quarters:
-            path = self.FAERS_path + q + '/' + tblname + q.upper()[2:] + '.txt'
+            path = os.path.join(self.data_dir, q, tblname + q.upper()[2:] + '.txt')
+            print('loading "{}"'.format(path))
             tmp = pd.read_csv(path, delimiter='$', usecols=usecols, dtype=cols)
-            df = df.append(tmp)
+            # df = df.append(tmp) #The frame.append method is deprecated and will be removed from pandas in a future version.
+            df = pd.concat([df, tmp], ignore_index=True)
             
         if sort: 
             return self.sort_df(df, sort)
@@ -113,27 +115,30 @@ class FAERS():
                                                     .reset_index(drop=True)
         
         # カテゴリーの修正
-        self.DRUG.iloc[:,1:] = self.DRUG.iloc[:,1:] \
-        .apply(lambda x: x.cat.remove_unused_categories().cat.add_categories('_NoCategories'))
-        self.REAC.iloc[:,1:] = self.REAC.iloc[:,1:] \
-        .apply(lambda x: x.cat.remove_unused_categories().cat.add_categories('_NoCategories'))
+        # self.DRUG.iloc[:,1:] = self.DRUG.iloc[:,1:] \
+        # .apply(lambda x: x.cat.remove_unused_categories().cat.add_categories('_undefined')) #FutureWarning
+        self.DRUG[self.DRUG.columns[1:]] = self.DRUG[self.DRUG.columns[1:]] \
+        .apply(lambda x: x.cat.remove_unused_categories().cat.add_categories('_undefined'))
+        # self.REAC.iloc[:,1:] = self.REAC.iloc[:,1:] \
+        # .apply(lambda x: x.cat.remove_unused_categories().cat.add_categories('_undefined')) #FutureWarning
+        self.REAC[self.REAC.columns[1:]] = self.REAC[self.REAC.columns[1:]] \
+        .apply(lambda x: x.cat.remove_unused_categories().cat.add_categories('_undefined'))
         
     
     def _dump_tables(self, out_dir):
         data = {}
         for col in self.DRUG.columns[1:]:
             df = self.DRUG[['primaryid', col]] \
-                                 .fillna('_NoCategories') \
+                                 .fillna('_undefined') \
                                  .drop_duplicates() \
                                  .reset_index(drop=True)
             tmp = self.to_sparseMatrix(df, 'primaryid', col)[:2]
-#             print(out_dir + col + '.pkl')
-#             print(tmp)
-            self._pickle_dump(tmp, out_dir + col + '.pkl')
+            self._pickle_dump(tmp, os.path.join(out_dir, col + '.pkl'))
+            self._pickle_dump(tmp[1], os.path.join(out_dir, col+'_labels.pkl'))
         
         for col in self.REAC.columns[1:]:
             df = self.REAC[['primaryid', col]] \
-                                 .fillna('_NoCategories') \
+                                 .fillna('_undefined') \
                                  .drop_duplicates() \
                                  .reset_index(drop=True)
             tmp = self.to_sparseMatrix(df, 'primaryid', col)[:2]

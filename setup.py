@@ -5,7 +5,9 @@ import requests
 from requests.exceptions import RequestException
 import zipfile
 from tqdm import tqdm
-import settings
+
+import config
+from faerstools2 import FAERS
 
 logger = logging.getLogger(__name__)
 
@@ -68,26 +70,38 @@ def rename_files(dir:str):
     for file in files:
         os.rename(file, file.replace('_new', ''))
 
+def setup_FAERS():
+    FAERS(out_path).load_files(params)
+        
 if __name__ == '__main__':
     
-    faers_url = settings.FAERS_URL
-    years = settings.YEARS
-    quarters = settings.quarters
-    download_dir = settings.DOWNLOAD_DIR
-    unpack_dir = settings.UNPACK_DIR
+    faers_url = config.FAERS_URL
+    # years = config.YEARS
+    quarters = config.QUARTERS
+    download_dir = config.DOWNLOAD_DIR
+    unpack_dir = config.UNPACK_DIR
+    cache_dir = config.CACHE_DIR
+    params = config.setup_params
 
     check_dir(download_dir)
     check_dir(unpack_dir)
     
-    for y in years:
-        for q in quarters:
-            filename = 'faers_ascii_' + y + q + '.zip'
-            url = os.path.join(faers_url, filename)
-            filepath = os.path.join(download_dir, filename)
-            out_path = os.path.join(unpack_dir, y+q)
-            if not os.path.exists(out_path) and check_request(url):
-                download(url, filepath)
-                unzip(filepath, unpack_dir)
-            rename_dir(unpack_dir, newname=y+q)
-    
+    # for y in years:
+    for q in quarters:
+        filename = 'faers_ascii_' + q + '.zip'
+        url = os.path.join(faers_url, filename)
+        filepath = os.path.join(download_dir, filename)
+        out_path = os.path.join(unpack_dir, q)
+        if os.path.exists(out_path):
+            print('"{}" already esists. Skip downloading.'.format(out_path))
+        elif not os.path.exists(out_path) and check_request(url):
+            download(url, filepath)
+            unzip(filepath, unpack_dir)
+            rename_dir(unpack_dir, q)
+
     rename_files(unpack_dir)
+    print('Downloading completed:)')
+    
+    # FAERS setup
+    pkl_dir = os.path.join(cache_dir, quarters[0] + '-' + quarters[-1])
+    FAERS(pkl_dir).load_files(params)
