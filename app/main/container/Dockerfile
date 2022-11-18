@@ -22,21 +22,31 @@ RUN groupadd -g $GID $GROUPNAME && \
     useradd -m -s /bin/bash -u $UID -g $GID -G sudo $USERNAME && \
     echo $USERNAME:$PASSWORD | chpasswd && \
     echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-USER $USERNAME 
+#ENV PATH $PATH:/home/$USERNAME/.local/bin
+#USER $USERNAME 
 
 #USER ${USER}
 
 EXPOSE 5000
 EXPOSE 8888
 
-RUN mkdir ${HOME}/work
-RUN mkdir ${HOME}/src
-WORKDIR ${HOME}
-COPY . ${HOME}/src 
+#RUN mkdir ${HOME}/work
+#RUN mkdir ${HOME}/src
+#WORKDIR ${HOME}
+#COPY . ${HOME}/src 
 
+RUN mkdir /data
+WORKDIR /app
+ENV FLASK_APP=app
+COPY ./requirements.txt ./
+
+USER $USERNAME
 RUN pip install -U pip
-RUN pip install -r src/requirements.txt
+#RUN pip install -r src/requirements.txt
+RUN pip install -r requirements.txt
 
+ENV PATH $PATH:/home/$USERNAME/.local/bin
+#
 #CMD /bin/bash
 #ENTRYPOINT ["/bin/bash", "src/entrypoint.sh"]
-ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["/bin/bash"]

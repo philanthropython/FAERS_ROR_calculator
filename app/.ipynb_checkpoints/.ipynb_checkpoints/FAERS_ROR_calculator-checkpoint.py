@@ -3,10 +3,7 @@ import argparse, os
 from flask import Flask, request, render_template, send_file, json, jsonify
 import pandas as pd
 import openpyxl
-
-import config
 from faerstools2 import FAERS
-
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
@@ -30,10 +27,10 @@ def main():
 #     getFormValues()
     #変数を初期化する
     f._load_pickles(levels, pkl_dir)
-    sammary['year'] = os.path.basename(pkl_dir)
-    sammary['n_cases'] = '{:,}'.format(f.DRUG.shape[0])
-    sammary['n_drugs'] = '{:,}'.format(f.DRUG.shape[1])
-    sammary['n_reacs'] = '{:,}'.format(f.REAC.shape[1])
+    sammary['year'] = pkl_dir[pkl_dir.find('/')+1:pkl_dir.rfind('/')]
+    sammary['n_cases'] = f.DRUG.shape[0]
+    sammary['n_drugs'] = f.DRUG.shape[1]
+    sammary['n_reacs'] = f.REAC.shape[1]
     params = {}
 
 #     sammary = {
@@ -55,7 +52,7 @@ def change_drug_level():
     drug_level = params['drug_level']
     params['drug_name'] = ''
     
-    fname = os.path.join(pkl_dir, drug_level + '_labels.pkl')
+    fname = pkl_dir + drug_level + '_labels.pkl'
     f.drug_labels = f._pickle_load(fname)
     sammary['n_drugs'] = len(f.drug_labels)
     message = sammary
@@ -70,7 +67,7 @@ def change_reac_level():
     reac_level = params['reac_level']
     params['reac_name'] = ''
 
-    fname = os.path.join(pkl_dir, reac_level + '_labels.pkl')
+    fname = pkl_dir + reac_level + '_labels.pkl'
     f.reac_labels = f._pickle_load(fname)
     sammary['n_reacs'] = len(f.reac_labels)
     
@@ -108,8 +105,9 @@ def result():
         result = f._RORbyReac(reac, sort={'CI95min':'desc'})
     else: return None
      
-    if not os.path.isdir('out'): os.mkdir('out')
-    fname = os.path.join('out', drug[:50] +'(' + levels['DRUG'] + ')' + '_' + reac + '(' + levels['REAC'] + ')')
+#     time = datetime.now().strftime(TIME_FORMAT)
+    #fname = 'out/' + drug + '_' + reac + '_' + time
+    fname = 'out/' + drug[:50] +'(' + levels['DRUG'] + ')' + '_' + reac + '(' + levels['REAC'] + ')'
      
     if ftype == 'xlsx':
         fname = fname + '.xlsx'
@@ -132,19 +130,14 @@ def getFormValues():
     
     
 if __name__ == '__main__':
-    quarters = config.QUARTERS
-    cache_dir = config.CACHE_DIR
-    pkl_dir = os.path.join(cache_dir, quarters[0] + '-' + quarters[-1])
-    port = config.PORT
-    
     parser = argparse.ArgumentParser()
-    parser.add_argument('-D', '--data_dir', default=pkl_dir, type=str, help='designate the directory which holds FAERS pickled data')
-    parser.add_argument('-p', '--port', default=port, type=int)
+    parser.add_argument('-D', '--data_dir', default='data/2015-2020', type=str, help='designate the directory which holds FAERS pickled data')
+    parser.add_argument('-p', '--port', default=5000, type=int)
     parser.add_argument('-d', '--debug', action='store_true')
     args = parser.parse_args()
     
-    # pkl_dir = args.data_dir
-    # if not pkl_dir[-1] == '/': pkl_dir = pkl_dir + '/'
+    pkl_dir = args.data_dir
+    if not pkl_dir[-1] == '/': pkl_dir = pkl_dir + '/'
         
     f = FAERS(pkl_dir)
 #     f._load_pickles(levels, pkl_dir)

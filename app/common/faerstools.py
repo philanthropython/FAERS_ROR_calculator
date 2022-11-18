@@ -55,8 +55,10 @@ class FAERS():
         for q in self.quarters:
             path = os.path.join(self.data_dir, q, tblname + q.upper()[2:] + '.txt')
             print('loading "{}"'.format(path))
-            tmp = pd.read_csv(path, delimiter='$', usecols=usecols, dtype=cols)
-            # df = df.append(tmp) #The frame.append method is deprecated and will be removed from pandas in a future version.
+            # pandas version>1.2から DRUG19Q3.txt のみ Shift-JIS を指定しないと decoding error で読み込めない。とりあえず encoding_errors='ignore' でエラーを無視。
+            tmp = pd.read_csv(path, delimiter='$', usecols=usecols, dtype=cols, encoding_errors='ignore')
+            # The frame.append method is deprecated and will be removed from pandas in a future version.
+            # df = df.append(tmp) 
             df = pd.concat([df, tmp], ignore_index=True)
             
         if sort: 

@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  app:
+    build: ./app/main/container
+    volumes:
+      - ./data:/data
+      - ./app/main:/app/main
+      - ./app/common:/app/common
+      - socket:/tmp
+    command: uwsgi --ini /app/main/app.ini
+
+  
+  web:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./web/nginx.conf:/etc/nginx/conf.d/default.conf
+      - socket:/tmp
+
+volumes:
+  socket:
