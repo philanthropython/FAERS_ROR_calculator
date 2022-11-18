@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-container
+    tty: true
+    working_dir: /home/user/work
+    ports: 
+      - 5000:5000
+      - 8888:8888
+    volumes:
+      - ..:/home/user/work
+
+#volumes:
+#  data:
