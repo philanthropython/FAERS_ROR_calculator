@@ -5,8 +5,8 @@ from flask import Flask, request, render_template, send_file, json, jsonify
 import pandas as pd
 import openpyxl
 
-import config
-from faerstools import FAERS
+from common import config
+from common.faerstools import FAERS
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0

@@ -1,8 +1,9 @@
 version: '3'
-
+name: FAERS
 services:
   app:
     build: ./app/main/container
+    container_name: app
     volumes:
       - ./data:/data
       - ./app/main:/app/main
@@ -13,6 +14,7 @@ services:
   
   web:
     image: nginx:latest
+    container_name: web
     ports:
       - 80:80
     volumes:

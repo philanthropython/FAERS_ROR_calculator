@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:latest
 
 RUN apt update && apt upgrade && apt install -y sudo vim
 
@@ -14,11 +14,8 @@ RUN groupadd -g $GID $GROUPNAME && \
     echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 ENV PATH $PATH:/home/$USERNAME/.local/bin
 
-EXPOSE 5000
-EXPOSE 8888
-
 RUN mkdir /data
-WORKDIR /app
+WORKDIR /app/main
 ENV FLASK_APP=app
 COPY ./requirements.txt ./
 
@@ -26,6 +23,6 @@ USER $USERNAME
 RUN pip install -U pip
 RUN pip install -r requirements.txt
 
-#CMD /bin/bash
-#ENTRYPOINT ["/bin/bash", "src/entrypoint.sh"]
-#ENTRYPOINT ["/bin/bash"]
+#EXPOSE 5000
+
+CMD ["uwsgi", "--ini", "app.ini"]

@@ -7,8 +7,8 @@ from requests.exceptions import RequestException
 import zipfile
 from tqdm import tqdm
 
-import config
-from faerstools import FAERS
+from common import config
+from common.faerstools import FAERS
 
 logger = logging.getLogger(__name__)
 
