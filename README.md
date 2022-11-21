@@ -8,6 +8,9 @@ https://docs.docker.com/engine/install/
 ```
 git clone https://github.com/philanthropython/FAERS_ROR_calculator.git
 ```
+```
+cd FAERS_ROR_calculator
+```
 
 3. Build a docker image for setup
 ```bash
