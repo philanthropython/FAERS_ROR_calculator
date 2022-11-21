@@ -1,5 +1,7 @@
 version: '3'
+
 name: FAERS
+
 services:
   app:
     build: ./app/main/container
@@ -10,8 +12,7 @@ services:
       - ./app/common:/app/common
       - socket:/tmp
     command: uwsgi --ini /app/main/app.ini
-
-  
+    restart: always
   web:
     image: nginx:latest
     container_name: web
@@ -20,6 +21,7 @@ services:
     volumes:
       - ./web/nginx.conf:/etc/nginx/conf.d/default.conf
       - socket:/tmp
+    restart: always
 
 volumes:
   socket:
