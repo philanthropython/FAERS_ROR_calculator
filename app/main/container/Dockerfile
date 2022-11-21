@@ -20,7 +20,7 @@ RUN groupadd -g $GID $GROUPNAME && \
 ENV PATH $PATH:/home/$USERNAME/.local/bin
 
 RUN mkdir /data
-WORKDIR /app/main
+WORKDIR /app
 ENV FLASK_APP=app
 COPY ./requirements.txt ./
 
@@ -29,5 +29,6 @@ RUN pip install -U pip
 RUN pip install -r requirements.txt
 
 #EXPOSE 5000
+#EXPOSE 8888
 
 CMD ["uwsgi", "--ini", "app.ini"]
