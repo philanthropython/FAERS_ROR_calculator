@@ -1,6 +1,10 @@
-FROM python:latest
+FROM python:slim
 
-RUN apt update && apt -y upgrade && apt install -y sudo vim
+RUN apt update && \
+    apt -y upgrade && \
+    apt install -y \
+        sudo \
+        vim
 
 ARG USERNAME=user
 ARG GROUPNAME=user
