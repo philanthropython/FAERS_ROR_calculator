@@ -1,7 +1,7 @@
 # FAERS_ROR_calculator
 
 ## Gtting started
-1. Install Docker
+1. Install Docker<br>
 https://docs.docker.com/engine/install/
 
 2. Download this repository
@@ -27,8 +27,13 @@ docker run --rm -v $PWD/data:/data -v $PWD/app:/app -it setup
 docker-compose up -d
 ```
 
-6. Access the server with any web browser of your choice
+6. Access the server with any web browser of your choice<br>
 http://localhost
 
+## Secure access
+Install remote.it to your host machine<br>
+https://ja.remote.it/download-list
+
 ## Configuration
-Edit app/common/config.py and repeat the above steps 3 and 4.
+Edit app/common/config.py and repeat the above steps 3 and 4
+
