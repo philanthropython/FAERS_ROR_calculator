@@ -21,7 +21,7 @@ Build docker images
 cd FAERS_ROR_calculator
 ```
 ```bash
-docker compose build
+docker-compose build
 ```
 
 ## Initial Setup
