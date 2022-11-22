@@ -1,27 +1,33 @@
 # FAERS_ROR_calculator
+A web application for calculating reported odds ratio (ROR) from FDA Adverse Event Reporting System (FAERS) data.<br>
+It commprises of Nginx + uWSGI + Flask components working on docker containers.
 
-## Getting Started
-Install Docker<br>
+## System Requirements
+Unused RAM > 8GB is recommended<br>
+Tested on Windows 10/11 + WSL2 with docker-desktop for Windows
+
+## Prerequisite
+Install docker and docker-compose<br>
 https://docs.docker.com/engine/install/
 
+## Getting Started
 Download this repository
-```
+```bash
 git clone https://github.com/philanthropython/FAERS_ROR_calculator.git
 ```
-```
+Build docker images
+```bash
 cd FAERS_ROR_calculator
 ```
-
-Build docker images
 ```bash
 docker compose build
 ```
 
 ## Initial Setup
-Start the setup container
+Start the setup container<br>
 This step may take several hours
 ```bash
-docker run --rm -v $PWD/app:/app -it faers-app
+docker run --rm -v $PWD/app:s/app -it faers-app
 ```
 If you need to update FAERS data, edit app/config.py and repeat this step again 
 
@@ -29,12 +35,12 @@ If you need to update FAERS data, edit app/config.py and repeat this step again
 ```bash
 docker-compose up -d
 ```
-Access `http://localhost` with a web browser<br>
+Access *http://localhost* with a web browser<br>
 
-## Secure access
+## Secure Access
 Install remote.it to your host machine and start HTTP service with a persistent public URL<br>
 https://ja.remote.it/download-list
 
 ## Configuration
-Edit app/common/config.py and repeat the above steps 3 and 4
+Edit *app/config.py* and repeat the setup process shown above.
 
