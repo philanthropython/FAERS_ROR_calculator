@@ -1,5 +1,4 @@
-import os, sys
-sys.path.append(os.pardir)
+import os
 import glob
 import logging
 import requests
@@ -7,8 +6,8 @@ from requests.exceptions import RequestException
 import zipfile
 from tqdm import tqdm
 
-from common import config
-from common.faerstools import FAERS
+import config
+from faerstools import FAERS
 
 logger = logging.getLogger(__name__)
 

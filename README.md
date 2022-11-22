@@ -1,10 +1,10 @@
 # FAERS_ROR_calculator
 
-## Gtting started
-1. Install Docker<br>
+## Getting Started
+Install Docker<br>
 https://docs.docker.com/engine/install/
 
-2. Download this repository
+Download this repository
 ```
 git clone https://github.com/philanthropython/FAERS_ROR_calculator.git
 ```
@@ -12,26 +12,27 @@ git clone https://github.com/philanthropython/FAERS_ROR_calculator.git
 cd FAERS_ROR_calculator
 ```
 
-3. Build a docker image for setup
+Build docker images
 ```bash
-docker build -t setup app/setup/container
+docker compose build
 ```
 
-4. Start the setup container
+## Initial Setup
+Start the setup container
+This step may take several hours
 ```bash
-docker run --rm -v $PWD/data:/data -v $PWD/app:/app -it setup
+docker run --rm -v $PWD/app:/app -it faers-app
 ```
+If you need to update FAERS data, edit app/config.py and repeat this step again 
 
-5. Start the web app server
+## Starting web-app server
 ```bash
 docker-compose up -d
 ```
-
-6. Access the server with any web browser of your choice<br>
-http://localhost
+Access `http://localhost` with a web browser<br>
 
 ## Secure access
-Install remote.it to your host machine<br>
+Install remote.it to your host machine and start HTTP service with a persistent public URL<br>
 https://ja.remote.it/download-list
 
 ## Configuration

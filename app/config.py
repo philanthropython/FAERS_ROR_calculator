@@ -11,9 +11,9 @@ QUARTERS = [
     '2022q1', '2022q2', '2022q3',
 ]
 
-DOWNLOAD_DIR = '../../data/zip'
-UNPACK_DIR = '../../data/txt'
-CACHE_DIR = '../../data/pkl'
+DOWNLOAD_DIR = 'data/zip'
+UNPACK_DIR = 'data/txt'
+CACHE_DIR = 'data/pkl'
 
 setup_params = {
     'data_dir': UNPACK_DIR,

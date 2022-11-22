@@ -4,14 +4,12 @@ name: FAERS
 
 services:
   app:
-    build: ./app/main/container
+    build: ./app/container
     container_name: app
     volumes:
-      - ./data:/data
-      - ./app/main:/app/main
-      - ./app/common:/app/common
+      - ./app:/app
       - socket:/tmp
-    command: uwsgi --ini /app/main/app.ini
+    command: uwsgi --ini /app/app.ini
     restart: always
   web:
     image: nginx:latest

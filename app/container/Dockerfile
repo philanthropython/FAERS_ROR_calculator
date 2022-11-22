@@ -4,7 +4,8 @@ RUN apt update && \
     apt -y upgrade && \
     apt install -y \
         sudo \
-        vim
+        vim \
+        gcc
 
 ARG USERNAME=user
 ARG GROUPNAME=user
@@ -19,13 +20,16 @@ RUN groupadd -g $GID $GROUPNAME && \
 ENV PATH $PATH:/home/$USERNAME/.local/bin
 
 RUN mkdir /data
-WORKDIR /app/setup
+WORKDIR /app
+ENV FLASK_APP=app
 COPY ./requirements.txt ./
 
 USER $USERNAME
 RUN pip install -U pip
 RUN pip install -r requirements.txt
 
-EXPOSE 8888
+#EXPOSE 5000
+#EXPOSE 8888
 
+#CMD ["uwsgi", "--ini", "app.ini"]
 CMD ["python", "setup.py"]
