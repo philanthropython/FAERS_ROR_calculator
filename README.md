@@ -3,8 +3,9 @@ A web application for calculating reported odds ratio (ROR) from FDA Adverse Eve
 It commprises of Nginx + uWSGI + Flask components working on docker containers.
 
 ## System Requirements
-Unused RAM > 8GB is recommended<br>
-Tested on Windows 10/11 + WSL2 with docker-desktop for Windows
+RAM: >8GB free space<br>
+Storage: >20GB free space<br>
+(Tested on Windows 10/11 + WSL2 with docker-desktop for Windows)
 
 ## Prerequisite
 Install docker and docker-compose<br>
