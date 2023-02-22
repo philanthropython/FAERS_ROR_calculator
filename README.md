@@ -28,7 +28,7 @@ docker-compose build
 Start the setup container<br>
 This step may take several hours
 ```bash
-docker run --rm -v $PWD/app:s/app -it faers-app
+docker run --rm -v $PWD/app:/app -it faers-app
 ```
 If you need to update FAERS data, edit app/config.py and repeat this step again 
 
