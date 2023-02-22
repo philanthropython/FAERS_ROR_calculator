@@ -21,7 +21,7 @@ Build docker images
 cd FAERS_ROR_calculator
 ```
 ```bash
-docker-compose build
+docker compose build
 ```
 
 ## Initial Setup
@@ -34,7 +34,7 @@ If you need to update FAERS data, edit app/config.py and repeat this step again
 
 ## Starting web-app server
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 Access *http://localhost* with a web browser<br>
 
